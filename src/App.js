@@ -1,7 +1,5 @@
 import { useRef, useState } from 'react';
 import './App.css';
-import './Popus.css';
-import Popup from './Popup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRotateRight } from '@fortawesome/free-solid-svg-icons'
 function App() {
@@ -12,7 +10,7 @@ function App() {
   const xMove = useRef([])
   const oMove = useRef([])
   let [preventclick,setPreventClick] = useState(false)
-  const [winnerStatus,setWinnerState] = useState(false)
+  const winnerStatus = useRef(false)
   const popup = document.getElementById("popup")
   let cuttingBoard
   const tiles = document.getElementsByClassName("tile");
@@ -26,12 +24,14 @@ function App() {
       cuttingBoard = board
       cuttingBoard.splice(index,1,'X')
       setBoard(cuttingBoard)
+      
       xMove.current.push(mapmoving(index))
       tiles[index].className += " x-tile"
       setTimeout(() =>{
         checkwinner(xMove,"X")
       },200)
       setXTurn(false)
+      setPreventClick(false)
     }else{
       cuttingBoard = board
       cuttingBoard.splice(index,1,'O')
@@ -42,6 +42,7 @@ function App() {
         checkwinner(oMove,"O")
       },200)
       setXTurn(true)
+      setPreventClick(false)
     }
     
   }
@@ -72,15 +73,13 @@ function App() {
         countScore(player)
         setResult(player)
         popup.style.top = "10px"
-        setWinnerState(true)
-        resetBoard()
+        winnerStatus.current =true
       }
       if(filterResultCol.length === 3){
         countScore(player)
         setResult(player)
         popup.style.top = "10px"
-        setWinnerState(true)
-        resetBoard()
+        winnerStatus.current =true
       }
     }
     // Check diagonal
@@ -92,42 +91,59 @@ function App() {
       countScore(player)
       setResult(player)
       popup.style.top = "10px"
-      setWinnerState(true)
-      resetBoard()
+      winnerStatus.current =true
     }
     if(filterResultDiagonal_45deg.length === 3){
       countScore(player)
       setResult(player)
       popup.style.top = "10px"
-      setWinnerState(true)
-      resetBoard()
+      winnerStatus.current =true
+      
     }
-    if(!winnerStatus && (xMove.current.length + oMove.current.length > 8)){
+    if(!winnerStatus.current && (xMove.current.length + oMove.current.length > 8)){
       countScore("0")
       popup.style.top = "10px"
       setResult("tie")
-      resetBoard()
+      
     }
-    setPreventClick(false)
   }
 
   const countScore = (player) =>{
-    if(player === 'X'){setScores(prv=> {return{...prv, xScore:prv.xScore + 1 }})}
-    else if(player === 'O'){setScores(prv=> {return{...prv, oScore:prv.oScore + 1 }})}
-    else{setScores(prv=> {return{...prv, tieScore:prv.tieScore + 1 }})}
+    
+    if(player === 'X'){
+      document.getElementById("scoreX").style.boxShadow = "0 0 20px #4ECCA3"
+      setScores(prv=> {return{...prv, xScore:prv.xScore + 1 }})
+    }
+    else if(player === 'O'){
+      document.getElementById("scoreO").style.boxShadow = "0 0 20px #FA5B5B"
+      setScores(prv=> {return{...prv, oScore:prv.oScore + 1 }})}
+    else{
+      document.getElementById("scoretie").style.boxShadow = "0 0 20px #EEEEEE"
+      setScores(prv=> {return{...prv, tieScore:prv.tieScore + 1 }})}
+    setPreventClick(true)
   }
   const resetBoard = ()=>{
+    setPreventClick(false)
     setBoard(['','','','','','','','',''])
     xMove.current = []
     oMove.current = []
-    setWinnerState(false)
+    winnerStatus.current = false
     for(let i=0; i<tiles.length; i++){
+      console.log("done")
       tiles[i].className = "tile"
     }
   }
 
   const clearScore = () =>{
     setScores({xScore:0,oScore:0,tieScore:0})
+  }
+
+  const hiding = () => {
+    document.getElementById("popup").style.top = "-150px";
+    document.getElementById("scoreX").style.boxShadow = "0 0 0px #4ECCA3"
+    document.getElementById("scoreO").style.boxShadow = "0 0 0px #FA5B5B"
+    document.getElementById("scoretie").style.boxShadow = "0 0 0px #EEEEEE"
+    resetBoard()
   }
 
   return (
@@ -142,19 +158,19 @@ function App() {
         </header>
         <div className='wrap-board'>
           {board.map((square,index) => 
-            <button className='tile' key={index} type='button' disabled = {preventclick.current} onClick={() => {handlePieces(index)}}>{square}</button>
+            <button className='tile' key={index} type='button' disabled = {preventclick} onClick={() => {handlePieces(index)}}>{square}</button>
           )}
         </div>
         <footer>
-          <div className='score scoreX'>
+          <div id='scoreX' className='score'>
             <p>X</p>
             <p>{scores.xScore}</p>
           </div>
-          <div className='score scoretie'>
+          <div id="scoretie"className='score '>
             <p>TIES</p>
             <p>{scores.tieScore}</p>
           </div>
-          <div className='score scoreO'>
+          <div id='scoreO' className='score'>
             <p>O</p>
             <p>{scores.oScore}</p>
           </div>
@@ -162,7 +178,13 @@ function App() {
          
         </footer>
       </div>
-      <Popup result={result}/>   
+      <div id='popup' className='wrap-popup'>
+            {(result === 'X')&& <p className='wrap-result'><span className='resule xwin'>{result}</span> WIN</p>}
+            {(result === 'O')&& <p className='wrap-result'><span className='resule owin'>{result}</span> WIN</p>}
+            {(result === 'tie')&& <p className='wrap-result'>TIE</p>}
+            {(result !== 'tie') ? <p className='point'>+1 point</p> : <p></p>}
+            <button className='close' onClick={()=>hiding()}>Close</button>
+        </div>
     </div>
   );
 }

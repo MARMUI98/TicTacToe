@@ -12,9 +12,6 @@
   justify-content: center;
   align-items: center;
 }
-.wrap{
-
-}
 .wrap header{
   display: flex;
   justify-content: center;
@@ -99,13 +96,15 @@ footer{
   border-radius: 20px;
 }
 
-.score.scoreX{
+#scoreX{
   background: #4ECCA3;
+  transition: 0.5s;
 }
-.score.scoretie{
+#scoretie{
   background: #EEEEEE;
+
 }
-.score.scoreO{
+#scoreO{
   background: #FA5B5B;
 }
 .btn-clear{
@@ -124,6 +123,59 @@ footer{
   background: #eac662;
 }
 
+.wrap-popup{
+  width: 300px;
+  height: 150px;
+  background: #D9D9D9;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  position: absolute;
+  top: -150px;
+  transition:0.3s ease-in;
+}
+
+.wrap-popup .wrap-result{
+  font-size: 30px;
+  font-weight: bold;
+  color: #393E46;
+}
+.xwin{
+  color: #4ECCA3;
+}
+.owin{
+  color: #FA5B5B;
+}
+.tie{
+  color: #393E46;
+}
+.point{
+  color: #d8bf2d;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.close{
+  width: 100%;
+  padding: 5px;
+  margin-top: 15px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  background: #AB5CB8;
+  font-size: 15px;
+  font-weight: bold;
+  color: #D9D9D9;
+}
+
+.close:hover{
+  opacity: 0.7;
+}
+
 @media only screen and (min-width: 1024px){
   .wrap-board{
     grid-template-columns: 130px 130px 130px;
@@ -137,3 +189,4 @@ footer{
     font-size: 22px;
   }
 }
+

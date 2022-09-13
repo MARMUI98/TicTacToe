@@ -1,7 +1,6 @@
 import React from 'react'
 import './Popus.css'
 const popup = (props) => {
-    ///const popup = document.getElementById("popup")
     const hiding = () => {
         document.getElementById("popup").style.top = "-150px";
     }
