@@ -15,11 +15,11 @@ function App() {
   let cuttingBoard
   const tiles = document.getElementsByClassName("tile");
   const handlePieces = (index) =>{
-    setPreventClick(true)
+    
     if (board[index] !== ''){
       return
     }
-    
+    setPreventClick(true)
     if (xturn){
       cuttingBoard = board
       cuttingBoard.splice(index,1,'X')
