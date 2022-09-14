@@ -7,31 +7,33 @@ function App() {
   const [xturn,setXTurn] = useState(true);
   const [scores,setScores] = useState({xScore:0,oScore:0,tieScore:0})
   const [result,setResult] =  useState('')
+  const preventclick = useRef(false)
   const xMove = useRef([])
   const oMove = useRef([])
-  let [preventclick,setPreventClick] = useState(false)
   const winnerStatus = useRef(false)
   const popup = document.getElementById("popup")
-  let cuttingBoard
   const tiles = document.getElementsByClassName("tile");
+  let cuttingBoard
+
   const handlePieces = (index) =>{
-    
     if (board[index] !== ''){
       return
     }
-    setPreventClick(true)
+    preventclick.current = true
     if (xturn){
       cuttingBoard = board
       cuttingBoard.splice(index,1,'X')
       setBoard(cuttingBoard)
-      
+
       xMove.current.push(mapmoving(index))
       tiles[index].className += " x-tile"
       setTimeout(() =>{
         checkwinner(xMove,"X")
       },200)
       setXTurn(false)
-      setPreventClick(false)
+      preventclick.current = false
+      
+      
     }else{
       cuttingBoard = board
       cuttingBoard.splice(index,1,'O')
@@ -42,12 +44,11 @@ function App() {
         checkwinner(oMove,"O")
       },200)
       setXTurn(true)
-      setPreventClick(false)
+      preventclick.current = false
     }
     
   }
   const mapmoving = (index) =>{
-
     let move 
     switch(index){
       case 0: return move = [0,0];
@@ -62,49 +63,38 @@ function App() {
       default: return move
     }
   }
+
   const checkwinner = (move,player) =>{
     let filterResultRow
     let filterResultCol
+    let filterResultDiagonal_315deg
+    let filterResultDiagonal_45deg
     // Check row and column
     for (let i=0; i<3; i++){
       filterResultRow = move.current.filter(e=> e[0] === i)
       filterResultCol = move.current.filter(e=> e[1] === i)
-      if(filterResultRow.length === 3){
-        countScore(player)
-        setResult(player)
-        popup.style.top = "10px"
-        winnerStatus.current =true
-      }
-      if(filterResultCol.length === 3){
-        countScore(player)
-        setResult(player)
-        popup.style.top = "10px"
-        winnerStatus.current =true
-      }
+      stepCheck(filterResultRow,player)
+      stepCheck(filterResultCol,player)
     }
     // Check diagonal
-    let filterResultDiagonal_315deg
-    let filterResultDiagonal_45deg
     filterResultDiagonal_315deg = move.current.filter(e=> e[0] === e[1])
     filterResultDiagonal_45deg = move.current.filter(e=> e[0]+ e[1] === 2)
-    if(filterResultDiagonal_315deg.length === 3){
-      countScore(player)
-      setResult(player)
-      popup.style.top = "10px"
-      winnerStatus.current =true
-    }
-    if(filterResultDiagonal_45deg.length === 3){
-      countScore(player)
-      setResult(player)
-      popup.style.top = "10px"
-      winnerStatus.current =true
-      
-    }
-    if(!winnerStatus.current && (xMove.current.length + oMove.current.length > 8)){
+    stepCheck(filterResultDiagonal_315deg,player)
+    stepCheck(filterResultDiagonal_45deg,player)
+
+    if(!winnerStatus.current && (xMove.current.length + oMove.current.length === 9)){
       countScore("0")
       popup.style.top = "10px"
       setResult("tie")
-      
+    }
+  }
+
+  const stepCheck = (filterResult,player) =>{
+    if(filterResult.length === 3){
+      countScore(player)
+      setResult(player)
+      popup.style.top = "10px"
+      winnerStatus.current =true
     }
   }
 
@@ -120,16 +110,16 @@ function App() {
     else{
       document.getElementById("scoretie").style.boxShadow = "0 0 20px #EEEEEE"
       setScores(prv=> {return{...prv, tieScore:prv.tieScore + 1 }})}
-    setPreventClick(true)
+    preventclick.current = true
   }
+
   const resetBoard = ()=>{
-    setPreventClick(false)
+    preventclick.current = false
     setBoard(['','','','','','','','',''])
     xMove.current = []
     oMove.current = []
     winnerStatus.current = false
     for(let i=0; i<tiles.length; i++){
-      console.log("done")
       tiles[i].className = "tile"
     }
   }
@@ -158,7 +148,7 @@ function App() {
         </header>
         <div className='wrap-board'>
           {board.map((square,index) => 
-            <button className='tile' key={index} type='button' disabled = {preventclick} onClick={() => {handlePieces(index)}}>{square}</button>
+            <button className='tile' key={index} type='button' disabled = {preventclick.current} onClick={() => {handlePieces(index)}}>{square}</button>
           )}
         </div>
         <footer>
