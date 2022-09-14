@@ -19,7 +19,6 @@ function App() {
     if (board[index] !== ''){
       return
     }
-    preventclick.current = true
     if (xturn){
       cuttingBoard = board
       cuttingBoard.splice(index,1,'X')
@@ -27,24 +26,17 @@ function App() {
 
       xMove.current.push(mapmoving(index))
       tiles[index].className += " x-tile"
-      setTimeout(() =>{
-        checkwinner(xMove,"X")
-      },200)
-      setXTurn(false)
-      preventclick.current = false
-      
-      
+      checkwinner(xMove,"X")
+      setXTurn(!xturn)
     }else{
       cuttingBoard = board
       cuttingBoard.splice(index,1,'O')
       setBoard(cuttingBoard)
+
       oMove.current.push(mapmoving(index))
       tiles[index].className += " o-tile"
-      setTimeout(() =>{
-        checkwinner(oMove,"O")
-      },200)
-      setXTurn(true)
-      preventclick.current = false
+      checkwinner(oMove,"O")
+      setXTurn(!xturn)  
     }
     
   }
@@ -83,7 +75,6 @@ function App() {
     stepCheck(filterResultDiagonal_45deg,player)
 
     if(!winnerStatus.current && (xMove.current.length + oMove.current.length === 9)){
-      countScore("0")
       popup.style.top = "10px"
       setResult("tie")
     }
@@ -91,6 +82,7 @@ function App() {
 
   const stepCheck = (filterResult,player) =>{
     if(filterResult.length === 3){
+      preventclick.current = true
       countScore(player)
       setResult(player)
       popup.style.top = "10px"
@@ -99,7 +91,6 @@ function App() {
   }
 
   const countScore = (player) =>{
-    
     if(player === 'X'){
       document.getElementById("scoreX").style.boxShadow = "0 0 20px #4ECCA3"
       setScores(prv=> {return{...prv, xScore:prv.xScore + 1 }})
@@ -110,7 +101,6 @@ function App() {
     else{
       document.getElementById("scoretie").style.boxShadow = "0 0 20px #EEEEEE"
       setScores(prv=> {return{...prv, tieScore:prv.tieScore + 1 }})}
-    preventclick.current = true
   }
 
   const resetBoard = ()=>{
