@@ -1,7 +1,7 @@
 
 # Tic Tac Toe
 
-juct tic tac toe but created in React
+just tic tac toe but created in React
 
 I dropped my app on Netlify. you can visit here: [MYXO](https://myxo.netlify.app/)
 
