@@ -74,8 +74,9 @@ function App() {
     stepCheck(filterResultDiagonal_315deg,player)
     stepCheck(filterResultDiagonal_45deg,player)
 
-    if(!winnerStatus.current && (xMove.current.length + oMove.current.length === 9)){
+    if(!winnerStatus.current && (xMove.current.length + oMove.current.length > 8)){
       popup.style.top = "10px"
+      countScore("tie")
       setResult("tie")
     }
   }
